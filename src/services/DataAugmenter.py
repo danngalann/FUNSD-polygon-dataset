@@ -3,7 +3,7 @@ from fastcore.foundation import L
 import cv2
 import json
 import numpy as np
-
+from typing import Tuple, List, Union
 
 class DataAugmenter:
     def __init__(self, config: dict = {}):
@@ -41,17 +41,10 @@ class DataAugmenter:
     def draw(self, b, c, clamp=None, do_slice=True):
         return random.uniform(b - c, b + c)
 
-    def augment(self, image_path: str, coordinates_path: str) -> Tuple[np.ndarray, list]:
-        # Load the image
-        image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+    def augment(self, image: np.ndarray, coordinates: List[dict]) -> Tuple[np.ndarray, List[dict]]:
+        # Convert BGR to RGB
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pil_img = PILImage.create(image)
-
-        # Load the coordinates (JSONL file)
-        coordinates = []
-        with open(coordinates_path, 'r') as f:
-            for line in f:
-                coordinates.append(json.loads(line))
 
         # Convert coordinates to a format suitable for fastai's PointScaler
         points = [coord['polygon'] for coord in coordinates]

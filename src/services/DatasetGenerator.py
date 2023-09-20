@@ -82,6 +82,6 @@ class DatasetGenerator:
 
                     if self.generate_debug_bounding_boxes:
                         # For debugging purposes, draw bounding boxes
-                        generate_bounding_boxes(str(augmented_json_path), str(augmented_image_path)) # TODO Refactor with new format
+                        generate_bounding_boxes(str(augmented_image_path), augmented_annotations)
 
                     pbar.update(1)

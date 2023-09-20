@@ -8,7 +8,7 @@ arguments = args.parse_args()
 
 
 def augment_dataset():
-    dataset_augmenter = DatasetGenerator(arguments.multiplier)
+    dataset_augmenter = DatasetGenerator(arguments.multiplier, True)
     dataset_augmenter.augment()
 
 

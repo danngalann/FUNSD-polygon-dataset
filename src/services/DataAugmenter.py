@@ -1,11 +1,10 @@
-from fastai.vision.all import *
-from fastcore.foundation import L
-import cv2
-import json
-import numpy as np
-from typing import Tuple, List, Union
+from typing import Tuple, List
 
-from src.dto.Annotation import Annotation, WordAnnotation
+import cv2
+import numpy as np
+import random
+
+from src.dto.Annotation import Annotation
 
 
 class DataAugmenter:

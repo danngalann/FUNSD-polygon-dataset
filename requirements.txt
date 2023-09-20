@@ -26,6 +26,7 @@ mpmath==1.2.1
 murmurhash==1.0.10
 networkx==3.0
 numpy==1.26.0
+opencv-python==4.8.0.76
 packaging==23.1
 pandas==2.1.0
 pathy==0.10.2

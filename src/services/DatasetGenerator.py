@@ -1,3 +1,4 @@
+import copy
 import os
 import cv2
 import json
@@ -59,11 +60,13 @@ class DatasetGenerator:
 
                 with open(json_path, 'r') as f:
                     annotation = json.loads(f.read())
-                    annotations = [Annotation.from_dict(annotation) for annotation in annotation['form']]
+                    original_annotations = [Annotation.from_dict(annotation) for annotation in annotation['form']]
 
                 for i in range(self.multiplier):
+                    annotations_to_augment = copy.deepcopy(original_annotations)
+
                     # Augment image
-                    augmented_image, augmented_annotations = self.data_augmenter.augment(image_data, annotations)
+                    augmented_image, augmented_annotations = self.data_augmenter.augment(image_data, annotations_to_augment)
 
                     # Save augmented image
                     augmented_image_filename = f'{image_filename.split(".")[0]}_augmented_{i}.png'

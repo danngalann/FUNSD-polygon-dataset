@@ -27,24 +27,27 @@ class DataAugmenter:
     def draw(self, b, c, clamp=None, do_slice=True):
         return random.uniform(b - c, b + c)
 
+    def coin_flip(self) -> bool:
+        return random.randint(0, 1) == 1
+
     def augment(self, image: np.ndarray, annotations: List[Annotation]) -> Tuple[np.ndarray, List[Annotation]]:
 
         if self.config['transform_perspective']:
             image, annotations = self.apply_perspective(image, annotations)
 
-        if self.config['add_lines']:
+        if self.config['add_lines'] and self.coin_flip():
             image = self.add_lines(image)
 
-        if self.config['random_contrast']:
+        if self.config['random_contrast'] and self.coin_flip():
             image = self.random_contrast(image)
 
-        if self.config['random_brightness']:
+        if self.config['random_brightness'] and self.coin_flip():
             image = self.random_brightness(image)
 
-        if self.config['random_saturation']:
+        if self.config['random_saturation'] and self.coin_flip():
             image = self.random_saturation(image)
 
-        if self.config['random_reflections']:
+        if self.config['random_reflections'] and self.coin_flip():
             image = self.random_reflections(image)
 
         return image, annotations
@@ -169,7 +172,7 @@ class DataAugmenter:
             cv2.line(image, (np.random.randint(0, row), np.random.randint(0, col)),
                      (np.random.randint(0, row), np.random.randint(0, col)),
                      (np.random.randint(0, 255), np.random.randint(0, 255), np.random.randint(0, 255)),
-                     np.random.randint(1, 9))
+                     np.random.randint(1, 3))
 
         return image
 

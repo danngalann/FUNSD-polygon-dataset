@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Tuple, List
 
 import cv2
@@ -23,6 +24,8 @@ class DataAugmenter:
         config = {**default_config, **config}
         self.config = config
 
+        self.bg_images = [cv2.imread(str(bg_path)) for bg_path in Path.cwd().glob('datasets/backgrounds/*.jpg')]
+
     # This function allows control over the range of augmentation changes
     def draw(self, b, c, clamp=None, do_slice=True):
         return random.uniform(b - c, b + c)
@@ -30,10 +33,17 @@ class DataAugmenter:
     def coin_flip(self) -> bool:
         return random.randint(0, 1) == 1
 
-    def augment(self, image: np.ndarray, annotations: List[Annotation]) -> Tuple[np.ndarray, List[Annotation]]:
-
+    def augment(
+            self,
+            image: np.ndarray,
+            annotations: List[Annotation]
+    ) -> Tuple[np.ndarray, List[Annotation]]:
         if self.config['transform_perspective']:
-            image, annotations = self.apply_perspective(image, annotations)
+            bg_image = None
+            if len(self.bg_images) > 0:
+                bg_image = random.choice(self.bg_images)
+
+            image, annotations = self.apply_perspective(image, annotations, bg_image)
 
         if self.config['add_lines'] and self.coin_flip():
             image = self.add_lines(image)
@@ -52,7 +62,12 @@ class DataAugmenter:
 
         return image, annotations
 
-    def apply_perspective(self, image: np.ndarray, annotations: List[Annotation]):
+    def apply_perspective(
+            self,
+            image: np.ndarray,
+            annotations: List[Annotation],
+            bg_image: np.ndarray = None
+    ) -> Tuple[np.ndarray, List[Annotation]]:
         # Compute the size of the image
         height, width = image.shape[:2]
 
@@ -96,6 +111,19 @@ class DataAugmenter:
 
         # Apply the perspective transformation
         warped_image = cv2.warpPerspective(image, perspective_mat, (width, height))
+
+        if bg_image is not None:
+            # If a background image is provided, resize it to match the dimensions of the original image
+            bg_image = cv2.resize(bg_image, (width, height))
+
+            # Create a white image and warp it using the same transformation matrix
+            white_image = np.ones((height, width, 3), dtype=np.uint8) * 255
+            warped_white_image = cv2.warpPerspective(white_image, perspective_mat, (width, height))
+
+            # Create a mask identifying where the warped_white_image has introduced new black pixels
+            mask = (warped_white_image == 0).all(axis=2)
+
+            warped_image[mask] = bg_image[mask]
 
         # Transform all coordinates
         new_annotations = []

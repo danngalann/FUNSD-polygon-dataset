@@ -73,7 +73,7 @@ class DatasetGenerator:
         cv2.imwrite(str(augmented_image_path), augmented_image)
 
         # Save augmented data
-        augmented_json_filename = f'{json_filename.split(".")[0]}__augmented_{i}.json'
+        augmented_json_filename = f'{json_filename.split(".")[0]}_augmented_{i}.json'
         augmented_json_path = annotation_save_path / augmented_json_filename
 
         with augmented_json_path.open('w') as augmented_jsonl_file:
